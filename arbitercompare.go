@@ -13,11 +13,11 @@ import (
 )
 
 type CompareResult struct {
-	name       string
-	comparison float32
+	Name       string  `json:"string"`
+	Comparison float32 `json:"float"`
 
-	containsLast bool
-	containsCurr bool
+	ContainsLast bool `json:"boolean"`
+	ContainsCurr bool `json:"boolean"`
 }
 
 func min(a, b int) int {
@@ -172,10 +172,14 @@ func main() {
 			}
 		}
 
-		comparisonResults[name] = CompareResult{name: name, comparison: comparison, containsLast: containsLast, containsCurr: containsCurr}
+		comparisonResults[name] = CompareResult{Name: name, Comparison: comparison, ContainsLast: containsLast, ContainsCurr: containsCurr}
 	}
 
 	comparisonJson, err := json.Marshal(comparisonResults)
+	if err != nil {
+		fmt.Printf("An error occured: %s", err.Error())
+		return
+	}
 
 	err = os.WriteFile(currentRunPath+"comparison.json", comparisonJson, 0777)
 	if err != nil {
