@@ -48,12 +48,15 @@ func CollectWebsites2(path string, websiteNames *map[string]string) error {
 
 			name = strings.ReplaceAll(name, "-", ":")
 			name = strings.ReplaceAll(name, "_", "/")
+			name = strings.ReplaceAll(name, ".png", "")
 
 			if (*websiteNames)[name] == "" {
 				(*websiteNames)[name] = entry.Name()
 			}
 		}
 	}
+
+	return nil
 }
 
 func CollectWebsites(lastRunPath string, currentRunPath string) (map[string]string, error) {
@@ -172,9 +175,9 @@ func main() {
 		comparisonResults[name] = CompareResult{name: name, comparison: comparison, containsLast: containsLast, containsCurr: containsCurr}
 	}
 
-	json, err := json.Marshal(comparisonResults)
+	comparisonJson, err := json.Marshal(comparisonResults)
 
-	err = os.WriteFile(currentRunPath+"comparison.json", json, 0777)
+	err = os.WriteFile(currentRunPath+"comparison.json", comparisonJson, 0777)
 	if err != nil {
 		fmt.Printf("An error occured: %s", err.Error())
 		return
