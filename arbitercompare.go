@@ -13,11 +13,11 @@ import (
 )
 
 type CompareResult struct {
-	Name       string  `json:"string"`
-	Comparison float32 `json:"float"`
+	Name       string  `json:"name"`
+	Comparison float32 `json:"comparison"`
 
-	ContainsLast bool `json:"boolean"`
-	ContainsCurr bool `json:"boolean"`
+	ContainsLast bool `json:"containsLast"`
+	ContainsCurr bool `json:"containsCurr"`
 }
 
 func min(a, b int) int {
