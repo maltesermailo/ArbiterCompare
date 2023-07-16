@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Screenshot Gallery</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: row;
+        }
+        .screenshot-list {
+            width: 20%;
+            overflow-y: auto;
+        }
+        .screenshot-list-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .screenshot-list-item:hover {
+            background-color: #ddd;
+        }
+        .screenshot-display {
+            width: 80%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 20px;
+        }
+        .screenshot {
+            width: 40%;
+            position: relative;
+        }
+        .status {
+            position: absolute;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+        }
+        img {
+            width: 100%;
+            height: auto;
+        }
+        .red-x {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="screenshot-list">
+        <!-- The screenshot names will be added here -->
+    </div>
+    <div class="screenshot-display">
+        <!-- The screenshot images and status text will be added here -->
+    </div>
+</div>
+
+<script>
+    // Replace with your actual data
+    const screenshots = {{.}} /*{
+        "lastRun": 1,
+        "currentRun": 2,
+        "comparisons": {
+            "test": {
+                name: "Test",
+                comparison: 1.0,
+                containsLast: true,
+                containsCurr: true
+            }
+        }
+
+
+        // Add more screenshots as needed
+    };*/
+
+    window.onload = function() {
+        const list = document.querySelector('.screenshot-list');
+        const display = document.querySelector('.screenshot-display');
+
+        for (let name in screenshots.comparisons) {
+            const item = document.createElement('div');
+            item.classList.add('screenshot-list-item');
+            item.innerHTML = `<span>${screenshots.comparisons[name].name}</span>`;
+            if(screenshots.comparisons[name].comparison < 0.90){
+                item.innerHTML += `<span class="red-x">X</span>`;
+            }
+            item.addEventListener('click', function() {
+                display.innerHTML = `
+                        <div class="screenshot">
+                            <img src="../${screenshots.lastRun}/${name}" alt="Before Screenshot">
+                        </div>
+                        <div class="screenshot">
+                            <img src="${name}" alt="After Screenshot">
+                        </div>
+                        <div class="status">${screenshots.comparisons[name].comparison}</div>
+                    `;
+            });
+            list.appendChild(item);
+        }
+    };
+</script>
+</body>
+</html>

@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"text/template"
 )
 
 type CompareResult struct {
@@ -18,6 +19,13 @@ type CompareResult struct {
 
 	ContainsLast bool `json:"containsLast"`
 	ContainsCurr bool `json:"containsCurr"`
+}
+
+type CompareHeader struct {
+	CurrentRun int64 `json:"currentRun"`
+	LastRun    int64 `json:"lastRun"`
+
+	CompareResults map[string]CompareResult `json:"comparisons"`
 }
 
 func min(a, b int) int {
@@ -161,7 +169,7 @@ func main() {
 
 			unequalPixels += int(diffPixels)
 
-			comparison = float32(unequalPixels) / (float32(maxX) * float32(maxY))
+			comparison = 1 - (float32(unequalPixels) / (float32(maxX) * float32(maxY)))
 		} else {
 			if containsCurr {
 				comparison = 1.0
@@ -172,10 +180,12 @@ func main() {
 			}
 		}
 
-		comparisonResults[name] = CompareResult{Name: name, Comparison: comparison, ContainsLast: containsLast, ContainsCurr: containsCurr}
+		comparisonResults[fileName] = CompareResult{Name: name, Comparison: comparison, ContainsLast: containsLast, ContainsCurr: containsCurr}
 	}
 
-	comparisonJson, err := json.Marshal(comparisonResults)
+	compareResult := CompareHeader{CurrentRun: *currentRun, LastRun: *lastRun, CompareResults: comparisonResults}
+
+	comparisonJson, err := json.Marshal(compareResult)
 	if err != nil {
 		fmt.Printf("An error occured: %s", err.Error())
 		return
@@ -187,5 +197,30 @@ func main() {
 		return
 	}
 
+	bytes, err := os.ReadFile("screenshots.template.html")
+	if err != nil {
+		fmt.Printf("An error occured: %s", err.Error())
+		return
+	}
+
 	//GENERATE HTML FILE
+	tmpl, err := template.New("screenshots").Parse(string(bytes))
+	if err != nil {
+		fmt.Printf("An error occured: %s", err.Error())
+		return
+	}
+
+	file, err := os.Create(currentRunPath + "screenshots.html")
+	if err != nil {
+		fmt.Printf("An error occured: %s", err.Error())
+		return
+	}
+
+	err = tmpl.Execute(file, string(comparisonJson))
+	if err != nil {
+		fmt.Printf("An error occured: %s", err.Error())
+		return
+	}
+
+	fmt.Println("Finished comparing")
 }
